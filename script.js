@@ -1,52 +1,47 @@
 let level = 0;
+let score = 0;
 let time = 15;
 let timer;
 
-/* ---------- QUESTIONS (ARRAY BASED) ---------- */
+/* ---------- QUESTIONS ---------- */
 const q = [
 {
 code:`let arr = [1,2,3];
 console.log(arr[3]);`,
-
 options:[
 "Fix arr[3] → arr[2]",
 "Add element",
 "Remove array"
 ],
-
 correct:0,
-explain:"✔ Arrays start at index 0 so last index is 2"
+explain:"Arrays start from 0 index, last index is 2."
 },
 
 {
 code:`let nums = [10,20,30];
 for(let i=0;i<=nums.length;i++){
-console.log(nums[i]);
+ console.log(nums[i]);
 }`,
-
 options:[
 "Change <= to <",
 "Remove loop",
 "Change array"
 ],
-
 correct:0,
-explain:"✔ <= causes undefined access, use < nums.length"
+explain:"<= causes undefined access. Use < nums.length."
 },
 
 {
 code:`let a = [5,10,15];
 a[1] = a[1] + 5;
 console.log(a);`,
-
 options:[
 "Correct code",
 "Change index",
 "Remove array"
 ],
-
 correct:0,
-explain:"✔ index 1 is valid and updated properly"
+explain:"Index 1 is valid and correctly updated."
 }
 ];
 
@@ -60,14 +55,15 @@ let box = document.getElementById("options");
 box.innerHTML="";
 
 q[level].options.forEach((op,i)=>{
-box.innerHTML += `
-<button onclick="check(${i})">${op}</button>
-`;
+box.innerHTML += `<button onclick="check(${i})">${op}</button>`;
 });
 
 document.getElementById("result").innerHTML="";
 
 startTimer();
+
+document.getElementById("level").innerText = "Level " + (level+1);
+document.getElementById("score").innerText = "Score: " + score;
 
 }
 
@@ -80,20 +76,17 @@ time = 15;
 timer = setInterval(()=>{
 
 time--;
-
-document.getElementById("level").innerText =
-`Level ${level+1} | Time Left: ${time}s`;
+document.getElementById("timer").innerText = "Time: " + time + "s";
 
 if(time <= 0){
-clearInterval(timer);
-gameOver("⏰ Time Over! Game Lost!");
+gameOver("⏰ Time Over!");
 }
 
 },1000);
 
 }
 
-/* ---------- CHECK ANSWER ---------- */
+/* ---------- CHECK ---------- */
 function check(ans){
 
 clearInterval(timer);
@@ -101,6 +94,8 @@ clearInterval(timer);
 let data = q[level];
 
 if(ans === data.correct){
+
+score++;
 
 document.getElementById("result").innerHTML =
 "🎉 Correct! " + data.explain;
@@ -113,36 +108,44 @@ level++;
 
 if(level >= q.length){
 document.getElementById("codeBox").innerText =
-"🏆 Game Completed! You learned arrays + debugging!";
+"🏆 Game Completed! Final Score: " + score;
 document.getElementById("options").innerHTML="";
 return;
 }
 
 load();
 
-},1500);
+},1200);
 
 }else{
 
-gameOver("💥 Wrong Answer! Game Over!");
+gameOver("💥 Wrong Answer!");
 }
 
 }
 
-/* ---------- NEXT BUTTON (optional manual skip) ---------- */
+/* ---------- NEXT ---------- */
 function nextQ(){
 
 level++;
 
 if(level >= q.length){
 document.getElementById("codeBox").innerText =
-"🏆 Game Completed!";
+"🏆 Finished!";
 document.getElementById("options").innerHTML="";
 return;
 }
 
 load();
 
+}
+
+/* ---------- RESTART ---------- */
+function restartGame(){
+level = 0;
+score = 0;
+time = 15;
+load();
 }
 
 /* ---------- WIN EFFECT ---------- */
@@ -190,9 +193,8 @@ document.getElementById("result").innerHTML = msg;
 
 loseEffect();
 
-document.getElementById("options").innerHTML="";
+document.getElementById("options").innerHTML = `
+<button onclick="restartGame()">🔁 Try Again</button>
+`;
 
 }
-
-/* ---------- START GAME ---------- */
-load();
