@@ -1,30 +1,27 @@
-let i = 0;
+let level = 0;
+let time = 15;
+let timer;
 
-/* ---------- QUESTIONS ---------- */
+/* ---------- QUESTIONS (ARRAY BASED) ---------- */
 const q = [
 {
-code: `let arr = [10,20,30];
+code:`let arr = [1,2,3];
 console.log(arr[3]);`,
 
 options:[
-"Change arr[3] to arr[2]",
-"Add arr.push(40)",
-"Use loop instead"
+"Fix arr[3] → arr[2]",
+"Add element",
+"Remove array"
 ],
 
 correct:0,
-
-explain:[
-"✔ Correct: Arrays start at index 0 so last index is 2",
-"❌ Wrong: Adding does not fix wrong index",
-"❌ Wrong: Loop not needed for single value"
-]
+explain:"✔ Arrays start at index 0 so last index is 2"
 },
 
 {
-code: `let nums = [1,2,3];
+code:`let nums = [10,20,30];
 for(let i=0;i<=nums.length;i++){
- console.log(nums[i]);
+console.log(nums[i]);
 }`,
 
 options:[
@@ -34,16 +31,11 @@ options:[
 ],
 
 correct:0,
-
-explain:[
-"✔ Correct: i < nums.length prevents undefined",
-"❌ Wrong: Removing loop breaks logic",
-"❌ Wrong: Array is fine"
-]
+explain:"✔ <= causes undefined access, use < nums.length"
 },
 
 {
-code: `let a = [5,10,15];
+code:`let a = [5,10,15];
 a[1] = a[1] + 5;
 console.log(a);`,
 
@@ -54,65 +46,153 @@ options:[
 ],
 
 correct:0,
-
-explain:[
-"✔ Correct: index 1 is valid and updated properly",
-"❌ Wrong: Changing breaks logic",
-"❌ Wrong: Array is required"
-]
+explain:"✔ index 1 is valid and updated properly"
 }
 ];
 
 /* ---------- LOAD QUESTION ---------- */
 function load(){
 
-document.getElementById("level").innerText =
-"Level " + (i+1);
-
 document.getElementById("codeBox").innerText =
-q[i].code;
+q[level].code;
 
 let box = document.getElementById("options");
 box.innerHTML="";
 
-q[i].options.forEach((op,index)=>{
-    box.innerHTML += `
-    <button onclick="check(${index})">${op}</button>
-    `;
+q[level].options.forEach((op,i)=>{
+box.innerHTML += `
+<button onclick="check(${i})">${op}</button>
+`;
 });
 
 document.getElementById("result").innerHTML="";
+
+startTimer();
+
+}
+
+/* ---------- TIMER ---------- */
+function startTimer(){
+
+clearInterval(timer);
+time = 15;
+
+timer = setInterval(()=>{
+
+time--;
+
+document.getElementById("level").innerText =
+`Level ${level+1} | Time Left: ${time}s`;
+
+if(time <= 0){
+clearInterval(timer);
+gameOver("⏰ Time Over! Game Lost!");
+}
+
+},1000);
+
 }
 
 /* ---------- CHECK ANSWER ---------- */
 function check(ans){
 
-let data = q[i];
+clearInterval(timer);
+
+let data = q[level];
 
 if(ans === data.correct){
-    document.getElementById("result").innerHTML =
-    "🎉 Correct! " + data.explain[0];
-}else{
-    document.getElementById("result").innerHTML =
-    "❌ Wrong! " + data.explain[ans];
-}
-}
 
-/* ---------- NEXT QUESTION ---------- */
-function nextQ(){
+document.getElementById("result").innerHTML =
+"🎉 Correct! " + data.explain;
 
-i++;
+winEffect();
 
-if(i >= q.length){
-    document.getElementById("codeBox").innerText =
-    "🏆 Game Finished! You learned debugging + arrays + loops.";
+setTimeout(()=>{
 
-    document.getElementById("options").innerHTML="";
-    return;
+level++;
+
+if(level >= q.length){
+document.getElementById("codeBox").innerText =
+"🏆 Game Completed! You learned arrays + debugging!";
+document.getElementById("options").innerHTML="";
+return;
 }
 
 load();
+
+},1500);
+
+}else{
+
+gameOver("💥 Wrong Answer! Game Over!");
 }
 
-/* start game */
+}
+
+/* ---------- NEXT BUTTON (optional manual skip) ---------- */
+function nextQ(){
+
+level++;
+
+if(level >= q.length){
+document.getElementById("codeBox").innerText =
+"🏆 Game Completed!";
+document.getElementById("options").innerHTML="";
+return;
+}
+
+load();
+
+}
+
+/* ---------- WIN EFFECT ---------- */
+function winEffect(){
+
+for(let i=0;i<15;i++){
+let b = document.createElement("div");
+b.innerHTML="🎈";
+b.style.position="fixed";
+b.style.left=Math.random()*100+"vw";
+b.style.bottom="0px";
+b.style.fontSize="25px";
+document.body.appendChild(b);
+
+setTimeout(()=>b.remove(),3000);
+}
+
+}
+
+/* ---------- LOSE EFFECT ---------- */
+function loseEffect(){
+
+const e = ["💥","😂","🤣","💀","☠️","😭"];
+
+for(let i=0;i<25;i++){
+let x = document.createElement("div");
+x.innerHTML = e[Math.floor(Math.random()*e.length)];
+x.style.position="fixed";
+x.style.left=Math.random()*100+"vw";
+x.style.top=Math.random()*100+"vh";
+x.style.fontSize="30px";
+document.body.appendChild(x);
+
+setTimeout(()=>x.remove(),2000);
+}
+
+}
+
+/* ---------- GAME OVER ---------- */
+function gameOver(msg){
+
+clearInterval(timer);
+
+document.getElementById("result").innerHTML = msg;
+
+loseEffect();
+
+document.getElementById("options").innerHTML="";
+
+}
+
+/* ---------- START GAME ---------- */
 load();
